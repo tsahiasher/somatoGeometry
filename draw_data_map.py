@@ -128,8 +128,7 @@ class getSigInd(argparse.Action):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog='draw_data_map',
-        description='Wrapper for draw_surface function. Draws a surface map of data',
-        add_help=False)
+        description='Wrapper for draw_surface function. Draws a surface map of data')
     parser.add_argument('--mapName', help='Name of the map to draw')
     parser.add_argument('--hemi', help='Side of the brain', choices=['lh', 'rh'])
     parser.add_argument('--fname', help='Name of the file to save the map to')
