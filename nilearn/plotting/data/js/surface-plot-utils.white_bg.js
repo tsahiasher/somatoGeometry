@@ -43,17 +43,17 @@ function getAxisConfig() {
 }
 
 function getLighting() {
-    return {};
-    // i.e. use plotly defaults:
-    // {
-    //     "ambient": 0.8,
-    //     "diffuse": .8,
-    //     "fresnel": .2,
-    //     "specular": .05,
-    //     "roughness": .5,
-    //     "facenormalsepsilon": 1e-6,
-    //     "vertexnormalsepsilon": 1e-12
-    // };
+    // return {};
+    i.e. use plotly defaults:
+    {
+        "ambient": 0.8,
+        "diffuse": .8,
+        "fresnel": .2,
+        "specular": .05,
+        "roughness": .5,
+        "facenormalsepsilon": 1e-6,
+        "vertexnormalsepsilon": 1e-12
+    };
 }
 
 function getConfig() {

@@ -50,7 +50,7 @@ bg_maps = {'lh': bg_map_lh, 'rh': bg_map_rh}
 side = {'lh': 'left', 'rh': 'right'}
 
 def draw_data_map(mapName, hemi=None, fname=None, title='', cmap=cont_cmap, surf='multi', sigInd=None, interData=False,
-                  vMin=None, vMax=None, threshold=0.00001, colorbar=True):
+                  vMin=None, vMax=None, threshold=0.00001, colorbar=True, contour=False):
     if isinstance(mapName, str):
         if not mapName.endswith('gii'):
             mapNameWords = mapName.lower().replace('.', '_').replace('\\', '_').replace('/', '_').split('_')
@@ -65,7 +65,7 @@ def draw_data_map(mapName, hemi=None, fname=None, title='', cmap=cont_cmap, surf
                 elif 'body' in mapNameWords:
                     cmap = cont_body_cmap
 
-            xData = load_mat(mapName)
+            xData = load_mat(mapName, use_main_folder=False)
         else:
             xData = surface.load_surf_data(mapName)
     else:
@@ -99,11 +99,25 @@ def draw_data_map(mapName, hemi=None, fname=None, title='', cmap=cont_cmap, surf
     if surf == 'multi':
         view = plotting.view_multi_surf(fsaverage, xData, colorbar_height=0.6, threshold=threshold, bg_map=bg_map,
                                         cmap=cmap, colorbar=colorbar, symmetric_cmap=False, title=title, vmax=vMax,
-                                        vmin=vMin, side=side[hemi], darkness=None)
+                                        vmin=vMin, side=side[hemi], darkness=None, return_info=contour)
     else:
         view = plotting.view_surf(fsaverage[f'{surf}_{side[hemi]}'], xData, threshold=threshold, bg_map=bg_map,
                                   cmap=cmap, colorbar=colorbar, symmetric_cmap=False, title=title, side=side[hemi],
-                                  colorbar_height=0.6, darkness=None)
+                                  colorbar_height=0.6, darkness=None, return_info=contour)
+
+    if contour:
+        contour_lines = np.zeros_like(xData)
+        dataNZ = xData[sigInd]
+        dataNZind = np.argwhere(xData).squeeze()
+        for j in range(16):
+            lower = np.quantile(dataNZ,0.0625*j+0.025)
+            upper = np.quantile(dataNZ,0.0625*j+0.0375)
+            contour_ind = np.argwhere((xData[dataNZind] > lower) & (xData[dataNZind] < upper)).squeeze()
+            contour_lines[dataNZind[contour_ind]] = 255
+
+        view = plotting.add_map(view, contour_lines, side[hemi], threshold=-1.1, cmap=ListedColormap(['black', "#000001"]),
+                                symmetric_cmap=False, return_info=False)
+
     if fname is not None:
         view_save_as_html(view, f'{fname}.html')
     view.open_in_browser()
@@ -141,14 +155,16 @@ if __name__ == "__main__":
     parser.add_argument('--threshold', help='Threshold value for the colormap', default=0.00001, type=float)
     parser.add_argument('--title', help='Title of the map', default='')
     parser.add_argument('--colorbar', help='Draw a colorbar', action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument('--contour', help='Add contour lines', action=argparse.BooleanOptionalAction, default=False)
+
     args = parser.parse_args()
 
     if args.mapName is None:
         args.mapName = filedialog.askopenfilename(title='Select map to draw', filetypes=[('Matlab files', '*.mat')],
                                                   initialdir='./')
-        if args.fname is None:
+        if args.mapName is None:
             parser.print_help()
             exit()
     draw_data_map(args.mapName, hemi=args.hemi, fname=args.fname, cmap=eval(args.cmap), surf=args.surf,
-                  sigInd=args.sigInd, interData=args.interData,
-                  vMin=args.vMin, vMax=args.vMax, threshold=args.threshold, title=args.title, colorbar=args.colorbar)
+                  sigInd=args.sigInd, interData=args.interData, vMin=args.vMin, vMax=args.vMax,
+                  threshold=args.threshold, title=args.title, colorbar=args.colorbar, contour=args.contour)

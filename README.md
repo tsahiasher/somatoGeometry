@@ -55,6 +55,8 @@ options:
   --title TITLE         Title of the map
   --colorbar, --no-colorbar
                         Draw a colorbar (default: True)
+  --contour, --no-contour
+                        Add contour lines (default: False)
 ```
 
 ![](data/body-sphere-lh.jpg)
@@ -71,6 +73,7 @@ To support non symmetrical data around 0 we made changes to the nilearn library 
 
 ## Data
 Subjects fMRI data is available at
+[https://openneuro.org/datasets/ds003089/versions/1.0.1](https://openneuro.org/datasets/ds003089/versions/1.0.1)
 
 <img src="data/body-sel-lh_hist.png" width="200">
 
