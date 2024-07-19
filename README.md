@@ -1,8 +1,10 @@
 # The geometry of somatosensory representations in the cortex
 
-code for the paper "The geometry of somatosensory representations in the cortex"
+Repository for paper "The geometry of somatosensory representations in the cortex"
 ## Abstract
 The well-known body map of the primary somatosensory cortex (S1), known as the homunculus, is spatially organized such that cortical areas sensitive to body parts, from head to toes, are organized from lateral to medial. Another way of characterizing somatosensory responses in the cortex is to consider them in the framework of the hierarchical nature of somatosensory information processing. Moving from rostral to caudal within S1, cortical responses become less selective, more bilateral, and more complex. This approximate orthogonality of body and hierarchy directions may allow the cortex to process information about each body part at multiple hierarchy levels. Body maps and hierarchies have also been identified in other regions in the somatosensory cortex. However, the geometric relationships between body representation and hierarchy have remained unclear because a unified description of these measures across the entire cortex has been lacking. Here we used functional MRI to characterize cortical responses to full-body light touch stimulation. We show that the orthogonal relationship between body representation and hierarchy in S1, does not generalize to the entire somatosensory cortex. Rather, it is a pinhole observation of a radial geometry of both the body representations and the hierarchy. Our findings are consistent with established body maps and hierarchies, but offers a holistic, macroscopic view of the organization of these maps  with respect to each other. Similar organizational patterns in the visual and auditory systems suggest that radial topography may be a common feature across sensory systems.
+
+[arXiv](https://www.biorxiv.org/content/10.1101/2024.07.11.603013v1) | [BibTeX](#bibtex)
 
 ![](data/body-selectivity-s1-lh.jpg)
 
@@ -80,3 +82,27 @@ Subjects fMRI data is available at
 *body selectivity histogram left hemisphere*
 
 ## Acknowledgements
+We thank Shahar Arzy for his support and Matthias Kaschube for fruitful discussions. We 
+thank Simon Eickhoff for his critical insights regarding the representation in the secondary 
+somatosensory cortex. We thank the ELSC MRI unit, Assaf Yohalashet, Lee Ashkenazi and 
+Yuval Porat for their dedicated work.
+
+## Funding
+This work was supported by the Gatsby Charitable Foundation and a grand from the DFG 
+(CRC 1080). YL Y.L. is the incumbent of the David and Inez Myers Chair in Neural
+Computation.
+
+## BibTeX
+```
+@article {Saadon-Grosman2024.07.11.603013,
+	author = {Saadon-Grosman, Noam and Asher, Tsahi and Loewenstein, Yonatan},
+	title = {On the Geometry of Somatosensory Representations in the Cortex},
+	elocation-id = {2024.07.11.603013},
+	year = {2024},
+	doi = {10.1101/2024.07.11.603013},
+	publisher = {Cold Spring Harbor Laboratory},
+	URL = {https://www.biorxiv.org/content/early/2024/07/16/2024.07.11.603013},
+	eprint = {https://www.biorxiv.org/content/early/2024/07/16/2024.07.11.603013.full.pdf},
+	journal = {bioRxiv}
+}
+```
