@@ -4,7 +4,6 @@ from matplotlib.colors import LinearSegmentedColormap, ListedColormap
 from tkinter import filedialog
 from loadmat import load_mat, view_save_as_html
 from nilearn import datasets, surface, plotting
-import matplotlib.pyplot as plt
 
 body_colors = ['darkblue', 'blue', 'cyan', 'green', 'lawngreen', 'yellow', 'orange', 'red']
 cont_body_cmap = LinearSegmentedColormap.from_list("cont_body_cmap", body_colors)
@@ -14,32 +13,23 @@ disc_cmap = ListedColormap(body_colors, name='disc_cmap')
 disc_cmap_r = disc_cmap.reversed()
 disc_white_cmap = ListedColormap(['white'] + body_colors, name='disc_white_cmap')
 
-red_cmap = ListedColormap(['red', 'red'], name='red_cmap')
+red_cmap = ListedColormap(['red','red'], name='red_cmap')
 
 colors = ['darkblue', 'blue', 'cyan', 'green', 'lawngreen', 'yellow', 'gold', 'orange', 'red', 'darkred']
+#colors = ['darkblue', 'cyan', 'green', 'lawngreen', 'yellow', 'gold', 'orange', 'darkred']
 cont_cmap = LinearSegmentedColormap.from_list("cont_cmap", colors)
 
 cont_cmap_r = cont_cmap.reversed()
 
-cyclic_colors = ['darkblue', 'blue', 'cyan', 'darkgreen', 'green', 'lime', 'orange', 'orangered', 'red', 'darkred',
-                 'red', 'orangered', 'orange',
-                 'goldenrod', 'gold', 'yellow', 'cyan', 'blue', 'darkblue']
-cyclic_cont_cmap = LinearSegmentedColormap.from_list("cyclic_cont_cmap", cyclic_colors)
-
-# rotate hsv such that the red and not cyan is in the middle
-# get hsv cm, call it with a rotated list from 0-1 to return the color values
-# and create from it a new colormap
-rotated_hsv = ListedColormap(plt.colormaps['hsv'](np.flip(np.roll(np.linspace(0, 1, 256), 128))))
-
 fsaverage = datasets.fetch_surf_fsaverage('fsaverage')
 
-bg_map_lh = surface.load_surf_data('./data/lh.avg_curv')
+bg_map_lh = surface.load_surf_data('./lh.avg_curv')
 bg_map_lh[bg_map_lh >= 0] = 0.75
 bg_map_lh[bg_map_lh < 0] = 0.5
 bg_map_lh[0] = 0
 bg_map_lh[1] = 1
 
-bg_map_rh = surface.load_surf_data('./data/rh.avg_curv')
+bg_map_rh = surface.load_surf_data('./rh.avg_curv')
 bg_map_rh[bg_map_rh >= 0] = 0.75
 bg_map_rh[bg_map_rh < 0] = 0.5
 bg_map_rh[0] = 0
@@ -69,7 +59,7 @@ def draw_data_map(mapName, hemi=None, fname=None, title='', cmap=cont_cmap, surf
         else:
             xData = surface.load_surf_data(mapName)
     else:
-        xData = mapName
+        xData = mapName.copy()
 
     xData[np.isnan(xData)] = 0
     if sigInd is not None:
@@ -104,7 +94,6 @@ def draw_data_map(mapName, hemi=None, fname=None, title='', cmap=cont_cmap, surf
         view = plotting.view_surf(fsaverage[f'{surf}_{side[hemi]}'], xData, threshold=threshold, bg_map=bg_map,
                                   cmap=cmap, colorbar=colorbar, symmetric_cmap=False, title=title, side=side[hemi],
                                   colorbar_height=0.6, darkness=None, return_info=contour)
-
     if contour:
         contour_lines = np.zeros_like(xData)
         dataNZ = xData[sigInd]
@@ -122,15 +111,14 @@ def draw_data_map(mapName, hemi=None, fname=None, title='', cmap=cont_cmap, surf
         view_save_as_html(view, f'{fname}.html')
     view.open_in_browser()
 
-
 class getSigInd(argparse.Action):
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
         super().__init__(option_strings, dest, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
-        if isinstance(values, str) and 'mat' in values:
+        if type(values) == str and 'mat' in values:
             tmp = load_mat(values)
-            if tmp.max() != 1:
+            if tmp.max()!=1:
                 sigInd = np.nonzero(tmp)[0]
             else:
                 sigInd = tmp.astype(bool)
@@ -142,7 +130,8 @@ class getSigInd(argparse.Action):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog='draw_data_map',
-        description='Wrapper for draw_surface function. Draws a surface map of data')
+        description='Wrapper for draw_surface function. Draws a surface map of data',
+        add_help=False)
     parser.add_argument('--mapName', help='Name of the map to draw')
     parser.add_argument('--hemi', help='Side of the brain', choices=['lh', 'rh'])
     parser.add_argument('--fname', help='Name of the file to save the map to')
@@ -156,15 +145,23 @@ if __name__ == "__main__":
     parser.add_argument('--title', help='Title of the map', default='')
     parser.add_argument('--colorbar', help='Draw a colorbar', action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument('--contour', help='Add contour lines', action=argparse.BooleanOptionalAction, default=False)
-
     args = parser.parse_args()
 
-    if args.mapName is None:
-        args.mapName = filedialog.askopenfilename(title='Select map to draw', filetypes=[('Matlab files', '*.mat')],
-                                                  initialdir='./')
-        if args.mapName is None:
+    if args.mapName == None:
+        args.mapName = filedialog.askopenfilename(title='Select map to draw', filetypes=[('Matlab files', '*.mat')], initialdir='./')
+        if args.mapName == None:
             parser.print_help()
             exit()
-    draw_data_map(args.mapName, hemi=args.hemi, fname=args.fname, cmap=eval(args.cmap), surf=args.surf,
-                  sigInd=args.sigInd, interData=args.interData, vMin=args.vMin, vMax=args.vMax,
-                  threshold=args.threshold, title=args.title, colorbar=args.colorbar, contour=args.contour)
+    draw_data_map(args.mapName, hemi=args.hemi, fname=args.fname, cmap=eval(args.cmap), surf=args.surf, sigInd=args.sigInd, interData=args.interData,
+                  vMin=args.vMin, vMax=args.vMax, threshold=args.threshold, title=args.title, colorbar=args.colorbar, contour=args.contour)
+
+# d = dict(map(lambda x: x.split('='),sys.argv[3:]))
+# fname = d.get('fname', '')
+# cmap = eval(d.get('cmap', cont_cmap))
+# surf = d.get('surf', 'multi')
+# sigInd = eval(d.get('sigInd', 'None'))
+# interData = eval(d.get('interData', 'True'))
+# vMin = eval(d.get('vMin', 'None'))
+# vMax = eval(d.get('vMax', 'None'))
+# threshold = eval(d.get('threshold', 'None'))
+# draw_data_map(sys.argv[1], sys.argv[2],fname=fname, cmap=cmap, surf=surf, sigInd=sigInd, interData=interData, vMin=vMin, vMax=vMax, threshold=threshold)
